@@ -4,4 +4,3 @@ twine
 pre-commit
 flake8
 flake8-bugbear
-yapf
