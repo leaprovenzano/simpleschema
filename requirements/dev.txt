@@ -1,3 +1,4 @@
 bumpversion
 tox
 twine
+pre-commit
