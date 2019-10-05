@@ -1,0 +1,7 @@
+repos:
+- repo: git://github.com/pre-commit/mirrors-yapf
+  hooks:
+  - id: yapf
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+  hooks:
+  - id: trailing-whitespace
