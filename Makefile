@@ -51,7 +51,7 @@ clean-test: clean-pyc## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 simpleschema tests
+	flake8 src/simpleschema tests
 
 test: ## run tests quickly with the default Python
 	py.test --cov src/simpleschema 
