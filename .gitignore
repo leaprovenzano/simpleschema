@@ -102,4 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# direnv
 .envrc
+
+# jupyter notebooks
+*.ipynb
+
