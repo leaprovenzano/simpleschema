@@ -30,7 +30,7 @@ class SchemaType(metaclass=ABCMeta):
         cls.__valid_descriptors__ | cls.__valid_constraints__
 
     @abstractclassmethod
-    def schema(cls, **kwargs):
+    def __schema__(cls, **kwargs):
         schema = SchemaDict(type=cls.__schema_type__)
         valid_fields = cls.__valid_descriptors__ | cls.__valid_constraints__
         for k, v in kwargs.items():
@@ -42,7 +42,7 @@ class SchemaType(metaclass=ABCMeta):
 
     def __subclasshook__(cls, t: type) -> bool:
         if cls is SchemaType:
-            return hasattr(t.schema) and callable(t.schema)
+            return hasattr(t.__schema__) and callable(t.__schema__)
         return NotImplemented
 
 
