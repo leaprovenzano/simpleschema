@@ -1,13 +1,22 @@
-from typing import Set
+from typing import Dict, Union, List, Set
 from functools import lru_cache
 from abc import abstractclassmethod, ABCMeta
 
 from simpleschema.utils import to_pascalcase
 
+JSONABLE = Union[bool, type(None), str, int, float, List['JSONABLE'], Dict[str, 'JSONABLE']]
+
 
 @lru_cache(maxsize=32)
 def pascalize(s: str):
     return to_pascalcase(s)
+
+
+class SchemaDict(dict):
+
+    def __set_item__(self, k: str, v: JSONABLE):
+        if v is not None:
+            super()[pascalize(k)] = v
 
 
 class SchemaType(metaclass=ABCMeta):
@@ -17,21 +26,24 @@ class SchemaType(metaclass=ABCMeta):
     __valid_descriptors__: Set[str] = {'title', 'description'}
 
     @classmethod
-    def _extract_descriptors(cls, **kwargs):
-        return {pascalize(k): v for k, v in kwargs.items() if k in cls.__valid_descriptors__}
-
-    @classmethod
-    def _extract_constraints(cls, **kwargs):
-        return {pascalize(k): v for k, v in kwargs.items() if k in cls.__valid_constraints__}
+    def _valid_fields(cls):
+        cls.__valid_descriptors__ | cls.__valid_constraints__
 
     @abstractclassmethod
     def schema(cls, **kwargs):
-        schema = {
-            'type': cls.__schema_type__,
-            **cls._extract_descriptors(**kwargs),
-            **cls._extract_constraints(**kwargs),
-        }
+        schema = SchemaDict(type=cls.__schema_type__)
+        valid_fields = cls.__valid_descriptors__ | cls.__valid_constraints__
+        for k, v in kwargs.items():
+            if k in valid_fields:
+                schema[k] = v
+            else:
+                raise ValueError(f'{k} is not a valid field for schema type {cls.__schema_type__}')
         return schema
+
+    def __subclasshook__(cls, t: type) -> bool:
+        if cls is SchemaType:
+            return hasattr(t.schema) and callable(t.schema)
+        return NotImplemented
 
 
 class String(SchemaType, str):
@@ -66,7 +78,6 @@ class Boolean(SchemaType):
     __supertype__ = bool
     __schema_type__ = 'boolean'
 
-    @classmethod
     def __new__(cls, x):
         return bool(x)
 
