@@ -2,32 +2,39 @@ from enum import Enum
 from itertools import chain
 
 
-class Date(Enum):
+class FormatEnum(Enum):
+
+    @property
+    def schema(self):
+        return {'type': 'string', 'format': self.value}
+
+
+class Date(FormatEnum):
 
     date_time = 'date-time'
-    time = 'date-time'
+    time = 'time'
     date = 'date'
 
 
-class Email(Enum):
+class Email(FormatEnum):
 
     email = 'email'
     idn_email = 'idn-email'
 
 
-class HostName(Enum):
+class HostName(FormatEnum):
 
     hostname = 'hostname'
     idn_hostname = 'idn-hostname'
 
 
-class IPAddress(Enum):
+class IPAddress(FormatEnum):
 
     ipv4 = 'ipv4'
     ipv6 = 'ipv6'
 
 
-class ResourceIdentifier(Enum):
+class ResourceIdentifier(FormatEnum):
 
     uri = 'uri'
     uri_reference = 'uri-reference'
@@ -36,18 +43,18 @@ class ResourceIdentifier(Enum):
     uri_template = 'uri-template'
 
 
-class JSONPointer(Enum):
+class JSONPointer(FormatEnum):
 
     json_pointer = 'json-pointer'
     relative_json_pointer = 'relative-json-pointer'
 
 
-class Regex(Enum):
+class Regex(FormatEnum):
 
     regex = 'regex'
 
 
-Format = Enum(
+Format = FormatEnum(
     'Format',
     [
         (i.name, i.value)
