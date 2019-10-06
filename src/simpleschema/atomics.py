@@ -52,7 +52,7 @@ class String(SchemaType, str):
     __valid_constraints__ = {'min_length', 'max_length', 'format', 'pattern'}
 
 
-class NumericSchema(SchemaType):
+class Numeric(SchemaType):
 
     __valid_constraints__ = {
         'minimum',
@@ -63,12 +63,12 @@ class NumericSchema(SchemaType):
     }
 
 
-class Number(NumericSchema, float):
+class Number(Numeric, float):
 
     __schema_type__ = 'number'
 
 
-class Integer(NumericSchema, int):
+class Integer(Numeric, int):
 
     __schema_type__ = 'integer'
 
