@@ -7,6 +7,7 @@ class AtomicSchema(SchemaType):
     __schema_cls__ = NotImplemented
     __atomic__ = True
 
+    @classmethod
     def __schema__(cls, **kwargs):
         return cls.__schema_cls__(**kwargs).to_dict()
 
@@ -38,7 +39,7 @@ class Boolean(AtomicSchema):
 class Null(AtomicSchema):
 
     __supertype__ = type(None)
-    _schema_cls = NullSchema
+    __schema_cls__ = NullSchema
 
     def __new__(cls):
         return None
