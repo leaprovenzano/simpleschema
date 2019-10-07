@@ -60,7 +60,7 @@ class BaseNumericSchema(GenericSchema):
 
 class NumberSchema(BaseNumericSchema):
 
-    type: ClassVar[str] = 'float'
+    type: ClassVar[str] = 'number'
 
 
 class IntegerSchema(BaseNumericSchema):
