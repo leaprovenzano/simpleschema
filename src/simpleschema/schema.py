@@ -1,13 +1,13 @@
 from typing import Union, ClassVar, get_type_hints
 
 from simpleschema.formats import Format
-from simpleschema.atomics import SchemaType, JSONABLE
 from simpleschema.utils import to_pascalcase
+from simpleschema.types import JSONABLE
 
 
 class GenericSchema:
 
-    type: SchemaType
+    type: str
     title: str
     description: str
 
