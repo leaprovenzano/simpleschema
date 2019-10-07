@@ -1,44 +1,15 @@
-from typing import Dict, Union, List, Set
-from functools import lru_cache
 from abc import abstractclassmethod, ABCMeta
 
-from simpleschema.utils import to_pascalcase
-
-JSONABLE = Union[bool, type(None), str, int, float, List['JSONABLE'], Dict[str, 'JSONABLE']]
-
-
-@lru_cache(maxsize=32)
-def pascalize(s: str):
-    return to_pascalcase(s)
-
-
-class SchemaDict(dict):
-
-    def __set_item__(self, k: str, v: JSONABLE):
-        if v is not None:
-            super()[pascalize(k)] = v
+from simpleschema.schema import BooleanSchema, IntegerSchema, NumberSchema, NullSchema, StringSchema
 
 
 class SchemaType(metaclass=ABCMeta):
 
-    __schema_type__: str = NotImplemented
-    __valid_constraints__: Set[str] = set([])
-    __valid_descriptors__: Set[str] = {'title', 'description'}
-
-    @classmethod
-    def _valid_fields(cls):
-        cls.__valid_descriptors__ | cls.__valid_constraints__
+    __schema_cls__ = NotImplemented
 
     @abstractclassmethod
     def __schema__(cls, **kwargs):
-        schema = SchemaDict(type=cls.__schema_type__)
-        valid_fields = cls.__valid_descriptors__ | cls.__valid_constraints__
-        for k, v in kwargs.items():
-            if k in valid_fields:
-                schema[k] = v
-            else:
-                raise ValueError(f'{k} is not a valid field for schema type {cls.__schema_type__}')
-        return schema
+        return NotImplemented
 
     def __subclasshook__(cls, t: type) -> bool:
         if cls is SchemaType:
@@ -46,37 +17,35 @@ class SchemaType(metaclass=ABCMeta):
         return NotImplemented
 
 
+class AtomicSchema(SchemaType):
+
+    __schema_cls__ = NotImplemented
+    __atomic__ = True
+
+    @abstractclassmethod
+    def __schema__(cls, **kwargs):
+        return cls.__schema_cls__(**kwargs).to_dict()
+
+
 class String(SchemaType, str):
 
-    __schema_type__ = 'string'
-    __valid_constraints__ = {'min_length', 'max_length', 'format', 'pattern'}
+    __schema_cls__ = StringSchema
 
 
-class Numeric(SchemaType):
+class Number(SchemaType, float):
 
-    __valid_constraints__ = {
-        'minimum',
-        'maximum',
-        'exclusive_minimum',
-        'exclusive_maximum',
-        'multiple_of',
-    }
+    __schema_cls__ = NumberSchema
 
 
-class Number(Numeric, float):
+class Integer(SchemaType, int):
 
-    __schema_type__ = 'number'
-
-
-class Integer(Numeric, int):
-
-    __schema_type__ = 'integer'
+    __schema_cls__ = IntegerSchema
 
 
 class Boolean(SchemaType):
 
     __supertype__ = bool
-    __schema_type__ = 'boolean'
+    __schema_cls__ = BooleanSchema
 
     def __new__(cls, x):
         return bool(x)
@@ -85,7 +54,7 @@ class Boolean(SchemaType):
 class Null(SchemaType):
 
     __supertype__ = type(None)
-    __schema_type__ = 'null'
+    _schema_cls = NullSchema
 
     def __new__(cls):
         return None
