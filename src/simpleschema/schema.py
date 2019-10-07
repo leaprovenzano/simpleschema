@@ -43,6 +43,11 @@ class StringSchema(GenericSchema):
     pattern: str
     format: Format
 
+    def __getattribute__(self, k: str):
+        if k == 'format':
+            return self.__dict__[k].value
+        return super().__getattribute__(k)
+
 
 class BaseNumericSchema(GenericSchema):
 
