@@ -3,13 +3,10 @@ from typing import Union, ClassVar, get_type_hints
 from simpleschema.formats import Format
 from simpleschema.utils import to_pascalcase
 from simpleschema.types import JSONABLE
+from simpleschema.schema.base import SchemaABC
 
 
-class GenericSchema:
-
-    type: str
-    title: str
-    description: str
+class AtomicSchema(SchemaABC):
 
     def __init_subclass__(cls, **kwargs):
         cls._fields = get_type_hints(cls)
@@ -35,7 +32,7 @@ class GenericSchema:
         return {self._aliases.get(k, k): getattr(self, k) for k in self._fields_set}
 
 
-class StringSchema(GenericSchema):
+class StringSchema(AtomicSchema):
 
     type: ClassVar[str] = 'string'
     min_length: int
@@ -49,7 +46,7 @@ class StringSchema(GenericSchema):
         return super().__getattribute__(k)
 
 
-class BaseNumericSchema(GenericSchema):
+class BaseNumericSchema(AtomicSchema):
 
     minimum: Union[int, float]
     maximum: Union[int, float]
@@ -68,11 +65,11 @@ class IntegerSchema(BaseNumericSchema):
     type: ClassVar[str] = 'integer'
 
 
-class NullSchema(GenericSchema):
+class NullSchema(AtomicSchema):
 
     type: ClassVar[str] = 'null'
 
 
-class BooleanSchema(GenericSchema):
+class BooleanSchema(AtomicSchema):
 
     type: ClassVar[str] = 'boolean'

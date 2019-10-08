@@ -1,12 +1,7 @@
 import pytest
-from simpleschema.schema import (
-    StringSchema,
-    NumberSchema,
-    IntegerSchema,
-    NullSchema,
-    BooleanSchema,
-    Format,
-)
+
+from simpleschema.formats import Format
+from simpleschema.schema import StringSchema, NumberSchema, IntegerSchema, NullSchema, BooleanSchema
 
 
 class SchemaSuite:
