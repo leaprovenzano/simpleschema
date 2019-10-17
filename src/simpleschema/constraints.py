@@ -1,10 +1,16 @@
 import re
 import typing as t
 from abc import ABCMeta, abstractmethod
-from simpleschema.utils import to_pascalcase
+from simpleschema.utils import to_pascalcase, method_dispatch
 
 
 Numeric = t.NewType('Numeric', t.Union[int, float])
+
+
+class InvalidConstraintError(ValueError):
+
+    def __init__(self, name, msg):
+        super().__init__(f'Invalid constraint {name} : {msg}')
 
 
 def is_implemented(attr):
@@ -26,21 +32,16 @@ class Constraint(metaclass=ABCMeta):
         return NotImplemented
 
 
-class InvalidConstraintError(ValueError):
-
-    def __init__(self, name, msg):
-        super().__init__(f'Invalid constraint {name} : {msg}')
-
-
 class LengthConstraint(Constraint):
 
     value: int
 
-    def __init__(self, value: int):
-        try:
-            value = int(value)
-        except TypeError:
-            raise InvalidConstraintError(self.__pyname__, 'must an integer')
+    @method_dispatch
+    def __init__(self, value):
+        raise InvalidConstraintError(self.__pyname__, 'must an integer')
+
+    @__init__.register
+    def _(self, value: int):
         if value < 0:
             raise InvalidConstraintError(self.__pyname__, 'must be positive')
         self.value = value
@@ -50,15 +51,15 @@ class MinLength(LengthConstraint):
 
     __pyname__ = 'min_length'
 
-    def __call__(self, x: t.Iterable) -> bool:
+    def __call__(self, x: t.Sized) -> bool:
         return len(x) >= self.value
 
 
-class MaxLength(Constraint):
+class MaxLength(LengthConstraint):
 
     __pyname__ = 'max_length'
 
-    def __call__(self, x: t.Iterable) -> bool:
+    def __call__(self, x: t.Sized) -> bool:
         return len(x) <= self.value
 
 
@@ -81,14 +82,29 @@ class Pattern(Constraint):
     def __init__(self, value: str):
         try:
             self.expr = re.compile(value)
-        except re.error as err:
-            InvalidConstraintError(self.__pyname__, f'Invalid pattern : {err}')
+        except (re.error, TypeError) as err:
+            raise InvalidConstraintError(self.__pyname__, f'Invalid pattern : {err}')
 
     def __call__(self, s: str) -> bool:
-        return self._exp.match(s) is not None
+        return self.expr.match(s) is not None
 
 
-class Minimum(Constraint):
+class NumericConstraint(Constraint):
+
+    @method_dispatch
+    def __init__(self, value):
+        raise InvalidConstraintError(self.__pyname__, 'must an numeric type')
+
+    @__init__.register
+    def _(self, value: float):
+        self.value = value
+
+    @__init__.register
+    def _(self, value: int):
+        self.value = value
+
+
+class Minimum(NumericConstraint):
 
     __pyname__ = 'minimum'
 
@@ -98,9 +114,9 @@ class Minimum(Constraint):
         return x >= self.value
 
 
-class Maximum(Constraint):
+class Maximum(NumericConstraint):
 
-    __pyname__ = 'maxiumum'
+    __pyname__ = 'maximum'
 
     value: Numeric
 
@@ -108,7 +124,7 @@ class Maximum(Constraint):
         return x <= self.value
 
 
-class ExclusiveMinimum(Constraint):
+class ExclusiveMinimum(NumericConstraint):
 
     __pyname__ = 'exclusive_minimum'
 
@@ -118,7 +134,7 @@ class ExclusiveMinimum(Constraint):
         return x > self.value
 
 
-class ExclusiveMaximum(Constraint):
+class ExclusiveMaximum(NumericConstraint):
 
     __pyname__ = 'exclusive_maxiumum'
 
@@ -128,11 +144,28 @@ class ExclusiveMaximum(Constraint):
         return x < self.value
 
 
-class MultipleOf(Constraint):
+class MultipleOf(NumericConstraint):
 
     __pyname__ = 'multiple_of'
 
     value: Numeric
 
+    def _validate_value(self, value: Numeric) -> Numeric:
+        if value > 0:
+            return value
+        raise InvalidConstraintError(self.__pyname__, 'must be > 0')
+
+    @method_dispatch
+    def __init__(self, value):
+        raise InvalidConstraintError(self.__pyname__, 'must an numeric type')
+
+    @__init__.register
+    def _(self, value: float):
+        self.value = self._validate_value(value)
+
+    @__init__.register
+    def _(self, value: int):
+        self.value = self._validate_value(value)
+
     def __call__(self, x: Numeric) -> bool:
-        return x % self.value == 0
+        return x != 0 and x % self.value == 0
