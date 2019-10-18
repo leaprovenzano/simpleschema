@@ -226,19 +226,17 @@ class TestMultipleOf(ConstraintSuite):
 
     @given(
         st.integers().filter(lambda x: x != 0).map(lambda x: x * 2)
-        | st.floats(allow_nan=False, allow_infinity=False)
-        .filter(lambda x: x != 0)
-        .map(lambda x: x * 2)
+        | st.integers().filter(lambda x: x != 0).map(lambda x: x * 2).map(float)
     )
+    @example(2.0)
+    @example(22)
+    @example(4)
     def test_validate_on_valid(self, inp):
-        print(inp)
         super().test_validate_on_valid(inp)
 
     @given(
         st.integers().filter(lambda x: x % 2 != 0)
         | st.floats(allow_nan=False, allow_infinity=False).filter(lambda x: x % 2 != 0)
     )
-    @example(0)
     def test_validate_on_invalid(self, inp):
-        print(inp)
         super().test_validate_on_invalid(inp)

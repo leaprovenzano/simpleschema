@@ -168,4 +168,4 @@ class MultipleOf(NumericConstraint):
         self.value = self._validate_value(value)
 
     def __call__(self, x: Numeric) -> bool:
-        return x != 0 and x % self.value == 0
+        return x % self.value == 0
