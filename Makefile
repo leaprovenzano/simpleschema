@@ -87,3 +87,5 @@ install: clean ## install the package to the active Python's site-packages
 install-local: clean ## install the package to the active Python's site-packages
 	pip install -e .
 
+install-dev: ## install local dev setup 
+
