@@ -16,22 +16,47 @@ simpleschema
 
 
 
-simpleschema : simple code based json schema creation and validation.
+.. image:: https://img.shields.io/badge/hypothesis-tested-brightgreen.svg
+   :alt: Tested with Hypothesis
+   :target: https://hypothesis.readthedocs.io
+
+----
 
 
 * Free software: MIT license
-* Documentation: https://simpleschema.readthedocs.io.
+
+* Documentation: `docs`_
+* Supported Python Versions: >=3.6
+
+----
 
 
-Features
---------
+Simple json schemas for python objects based on type hints.
+
+
+
+Getting Started:
+~~~~~~~~~~~~~~~~
+
+Install the latest stable version with pip::
+
+   $ pip install simpleschema
+
+
+**Checkout the docs**:
+
+It's best to checkout the `docs`_. There you'll find detailed
+documentation of simpleschema}'s features and lots of examples of
+how to use them.
+
+What's is it?
+~~~~~~~~~~~~~
 
 * TODO
 
-Credits
--------
+Principles:
+~~~~~~~~~~~
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+* TODO
 
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+.. _docs: https://simpleschema.readthedocs.io

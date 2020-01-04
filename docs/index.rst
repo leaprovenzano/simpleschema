@@ -1,20 +1,23 @@
-Welcome to simpleschema's documentation!
-======================================
+simpleschema docs
+====================================
+
+.. include:: ../README.rst
+
+.. currentmodule:: simpleschema
+
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   readme
-   installation
-   usage
-   simpleschema
-   contributing
-   authors
-   history
+.. autosummary::
+   :toctree: _autosummary
+   
+
 
 Indices and tables
 ==================
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
